@@ -128,11 +128,11 @@ function New-FoDLanguageFeaturesRepository {
 function New-CMLanguagePackApplication {
     <#
     .SYNOPSIS
-        Create a Configuration Manager Application with two deployment types to install LP, LXP and FoD (as system) and make the language available to the user in the Settings language list.
+        Create a Configuration Manager Application with two deployment types to install LP, LXP and FoD (as system) and make the language available to the user in the Settings language list (as user).
     .DESCRIPTION
-        Create a Configuration Manager Application with two deployment types to install LP, LXP and FoD (as system) and make the language available to the user in the Settings language list.
+        Create a Configuration Manager Application with two deployment types to install LP, LXP and FoD (as system) and make the language available to the user in the Settings language list (as user).
     .EXAMPLE
-        PS C:\> New-CMLanguagePackApplication
+        PS C:\> New-CMLanguagePackApplication -SiteServer "cm.contoso.com" -SiteCode "P01" -SourcePath "\\cm.contoso.com\OSD\Source\1909-Languages" -Languages "fr-fr", "de-de" -$WindowsVersion = @{ 'Version' = '1909'; 'Build' = '18363' } -GlobalConditionName 'Operating System build' -CreateAppIfMissing -CreateGlobalConditionIfMissing
 
         Explanation of what the example does
     .NOTES
