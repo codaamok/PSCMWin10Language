@@ -131,12 +131,68 @@ function New-CMLanguagePackApplication {
         Create a Configuration Manager Application with two deployment types to install LP, LXP and FoD (as system) and make the language available to the user in the Settings language list (as user).
     .DESCRIPTION
         Create a Configuration Manager Application with two deployment types to install LP, LXP and FoD (as system) and make the language available to the user in the Settings language list (as user).
+    .PARAMETER SiteServer
+        FQDN to your site server.
+    .PARAMETER SiteCode
+        Site code of your ConfigMgr hierarchy for the given SiteServer.
+    .PARAMETER SourcePath
+        UNC path to the LP, LXP and FoD repositories for each language created using the commands in this module. The folder structure could look like this:
+
+        PS C:\> Get-ChildItem -Path "\\sccm.acc.local\osd\Source\1909-Languages" -Recurse -Depth 1
+        
+            Directory: \\sccm.acc.local\osd\Source\1909-Languages
+
+
+        Mode                LastWriteTime         Length Name                                                                                  
+        ----                -------------         ------ ----                                                                                  
+        d-----       31/05/2020     19:10                de-de                                                                                 
+        d-----       31/05/2020     19:09                fr-fr                                                                                 
+
+
+            Directory: \\sccm.acc.local\osd\Source\1909-Languages\de-de
+
+
+        Mode                LastWriteTime         Length Name                                                                                  
+        ----                -------------         ------ ----                                                                                  
+        d-----       29/05/2020     21:25                FoD                                                                                   
+        d-----       29/05/2020     21:24                LP                                                                                    
+        d-----       29/05/2020     21:26                LXP                                                                                   
+        -a----       31/05/2020     20:59            442 Install.ps1                                                                           
+
+
+            Directory: \\sccm.acc.local\osd\Source\1909-Languages\fr-fr
+
+
+        Mode                LastWriteTime         Length Name                                                                                  
+        ----                -------------         ------ ----                                                                                  
+        d-----       29/05/2020     21:25                FoD                                                                                   
+        d-----       29/05/2020     21:24                LP                                                                                    
+        d-----       29/05/2020     21:26                LXP                                                                                   
+        -a----       31/05/2020     20:58            442 Install.ps1                                                                           
+    .PARAMETER Languages
+        An array of language tags that match the language items in the given -SourcePath. For example, if -SourcePath contains $SourcePath\LP\de-DE, $SourcePath\LXP\de-DE and $SourcePath\FoD\de-DE then -Languages should be "de-DE" (not case sensitive). If you want create more applications for more languages, make use of the array and add more. Make sure you have your LP, LXP and FoD repositories populated with the appropriate cab and appx files.
+    .PARAMETER WindowsVersion
+        A hashtable which denotes the verison and build number of Windows 10 you're deploying language items for. Must contain two keys: "Version" and "Build". For example:
+
+        PS C:\> @{ "Version" = "1909"; "Build = "18363"}
+    .PARAMETER GlobalConditionName
+        Name of the Global Condition which queries WMI class Win32_OperatingSystem for property Build. A termianting error is thrown if a Global Condition with the given name does not exist. If it does exist, but does not query class Win32_OperatingSystem for proeprty Build, a termianting error will be thrown. Use -CreateGlobalConditionIfMissing if necessary.
+    .PARAMETER CreateAppIfMissing
+        If the application(s) of the name "Windows 10 x64 Language Pack - $languagetag" cannot be found, use this switch to create it.
+    .PARAMETER CreateGlobalConditionIfMissing
+        If the Global Condition "Oeprating System build" is missing, use this switch to create it. 
     .EXAMPLE
         PS C:\> New-CMLanguagePackApplication -SiteServer "cm.contoso.com" -SiteCode "P01" -SourcePath "\\cm.contoso.com\OSD\Source\1909-Languages" -Languages "fr-fr", "de-de" -$WindowsVersion = @{ 'Version' = '1909'; 'Build' = '18363' } -GlobalConditionName 'Operating System build' -CreateAppIfMissing -CreateGlobalConditionIfMissing
 
-        Explanation of what the example does
+        Adds two new deployment types to applications with names "Windows 10 x64 Language Pack - fr-fr" and "Windows 10 x64 Language Pack - de-de". If the applications do not exist, create them.
+        The deployment type names are "$version ($build) - Install language items (SYSTEM)" and "$version ($build) - Configure language list (USER)". 
+        A Global Condition named "Operating System build" will be created if it does not exist.
+        Install.ps1 is created and stored in "\\cm.contoso.com\OSD\Source\1909-Languages".
+        Deployment type (SYSTEM) has a source path set to "\\cm.contoso.com\OSD\Source\1909-Languages" which should contain your LP, LXP and FoDs in a folder structure as e.g. ".\LP\",".\LXP\",".\FoD\". The system deployment type executes Install.ps1 and run this as system. It installs LP, LXP and FoDS. The requirement for this deployment type is set to Windows 10 build 18363 using the Global Condition "Operating System build".
+        Deployment type (USER) has no source path and runs a series of PowerShell commands to finalise the LXP install for the user, and set the user's current language to the target language. An exit code of 3010 is returned, a reboot is necessary. The requirement for this deployment type is set to Windows 10 build 18363 using the Global Condition "Operating System build". This user deployment type has a dependency on the system deployment type. The user deployment type will have a higher priority than the system deployment type.
     .NOTES
         Author: Adam Cook (@codaamok)
+        TODO: Query for site code instead of making it a mandatory parameter.
     #>
     [CmdletBinding()]
     param (
@@ -237,7 +293,7 @@ function New-CMLanguagePackApplication {
             $ContentLocation = '{0}\{1}' -f $SourcePath, $Language
             $AppName = 'Windows 10 x64 Language Pack - {0}' -f $Language.toUpper()
             $InstallDTName = '{0} ({1}) - Install language items (SYSTEM)' -f $WindowsVersion['Version'], $WindowsVersion['Build']
-            $SetLanguageListDTName = '{0} ({1}) - Configure language list (USER)' -f $WindowsVersion['Version'], $WindowsVersion['Build']
+            $SetLanguageListDTName = '{0} ({1}) - Set language (USER)' -f $WindowsVersion['Version'], $WindowsVersion['Build']
     
             Push-Location $OriginalLocation
             if (-not (Test-Path ('filesystem::{0}' -f $ContentLocation))) {
