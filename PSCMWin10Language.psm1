@@ -192,7 +192,6 @@ function New-CMLanguagePackApplication {
         Deployment type (USER) has no source path and runs a series of PowerShell commands to finalise the LXP install for the user, and set the user's current language to the target language. An exit code of 3010 is returned, a reboot is necessary. The requirement for this deployment type is set to Windows 10 build 18363 using the Global Condition "Operating System build". This user deployment type has a dependency on the system deployment type. The user deployment type will have a higher priority than the system deployment type.
     .NOTES
         Author: Adam Cook (@codaamok)
-        TODO: Query for site code instead of making it a mandatory parameter.
     #>
     [CmdletBinding()]
     param (
@@ -200,7 +199,7 @@ function New-CMLanguagePackApplication {
         [ValidateNotNullOrEmpty()]
         [String]$SiteServer,
         
-        [Parameter(Mandatory)]
+        [Parameter()]
         [ValidateNotNullOrEmpty()]
         [String]$SiteCode,
 
@@ -262,6 +261,21 @@ function New-CMLanguagePackApplication {
     )
     begin {
         $OriginalLocation = (Get-Location).Path
+
+        try {
+            if (-not $PSBoundParameters.ContainsKey('SiteCode')) {
+                $SiteCode = Get-CimInstance -ComputerName $SiteServer -ClassName 'SMS_ProviderLocation' -Namespace 'ROOT\SMS' -ErrorAction "Stop" | Select-Object -ExpandProperty SiteCode
+                if ($SiteCode -isnot [Object] -And $SiteCode.Count -eq 0) {
+                    Write-Error -Message 'Could not determine site code, please consider using -SiteCode' -Category 'ObjectNotFound' -ErrorAction 'Stop'
+                }
+                elseif ($SiteCode.Count -gt 1) {
+                    Write-Error -Message ('Found multiple site codes ({0}), please consider using -SiteCode' -f ($SiteCode -join ', ')) -Category 'InvalidData' -TargetObject $SiteCode -ErrorAction 'Stop'
+                }
+            }
+        }
+        catch {
+            $PSCmdlet.ThrowTerminatingError($_)
+        }
 
         Import-Module ('{0}\..\ConfigurationManager.psd1' -f $ENV:SMS_ADMIN_UI_PATH) -ErrorAction 'Stop'
 
