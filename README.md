@@ -55,9 +55,9 @@ The deployment type names are "$version ($build) - Install language items (SYSTE
 
 A Global Condition named "Operating System build" will be created if it does not exist.
 
-Install.ps1 is created and stored in "\\cm.contoso.com\OSD\Source\1909-Languages".
+Install.ps1 is created and stored in "\\\\cm.contoso.com\OSD\Source\1909-Languages".
 
-Deployment type (SYSTEM) has a source path set to "\\cm.contoso.com\OSD\Source\1909-Languages" which should contain your LP, LXP and FoDs in a folder structure as e.g. ".\LP\",".\LXP\",".\FoD\". The system deployment type executes Install.ps1 and run this as system. It installs LP, LXP and FoDS. The requirement for this deployment type is set to Windows 10 build 18363 using the Global Condition "Operating System build".
+Deployment type (SYSTEM) has a source path set to "\\\\cm.contoso.com\OSD\Source\1909-Languages" which should contain your LP, LXP and FoDs in a folder structure as e.g. ".\LP\",".\LXP\",".\FoD\". The system deployment type executes Install.ps1 and run this as system. It installs LP, LXP and FoDS. The requirement for this deployment type is set to Windows 10 build 18363 using the Global Condition "Operating System build".
 
 Deployment type (USER) has no source path and runs a series of PowerShell commands to finalise the LXP install for the user, and set the user's current language to the target language. An exit code of 3010 is returned, a reboot is necessary. The requirement for this deployment type is set to Windows 10 build 18363 using the Global Condition "Operating System build". This user deployment type has a dependency on the system deployment type. The user deployment type will have a higher priority than the system deployment type.
 
