@@ -62,3 +62,12 @@ Deployment type (SYSTEM) has a source path set to "\\cm.contoso.com\OSD\Source\1
 Deployment type (USER) has no source path and runs a series of PowerShell commands to finalise the LXP install for the user, and set the user's current language to the target language. An exit code of 3010 is returned, a reboot is necessary. The requirement for this deployment type is set to Windows 10 build 18363 using the Global Condition "Operating System build". This user deployment type has a dependency on the system deployment type. The user deployment type will have a higher priority than the system deployment type.
 
 ___
+
+## Acknowledgements 
+
+Thanks to the following who helped me:
+
+- [SaltyPeaches](https://github.com/saltyPeaches)
+- [theaquamarine](https://github.com/theaquamarine)
+- [CodyMathis123](https://github.com/codymathis123)
+- [asjimene](https://github.com/asjimene)
