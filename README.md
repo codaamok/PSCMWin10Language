@@ -1,7 +1,7 @@
 # PSCMWin10Language
 A PowerShell module which helps you create Language Pack, Language Experience Pack and Features on Demand repositories. You can also create a Configuration Manager application which allows users to install new languages from the Software Center using said repositories as source directories.
 
-Read more about the context of this module and how to use it [in my blog post at SysManSquad](https://sysmansquad.com/2020/06/04/deploy-languages-via-software-center-with-pscmwin10language/).
+Read more about the context of this module and how to use it [in my blog post at SysManSquad](https://sysmansquad.com/2020/06/08/deploy-languages-via-software-center-with-pscmwin10language/).
 
 ## Functions
 
