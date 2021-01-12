@@ -46,7 +46,7 @@ Copies Features on Demand of LanguageFeatures Basic, Handwriting, OCR, Speech an
 ___
 
 ```powershell
-PS C:\> New-CMLanguagePackApplication -SiteServer "cm.contoso.com" -SiteCode "P01" -SourcePath "\\cm.contoso.com\OSD\Source\1909-Languages" -Languages "fr-fr", "de-de" -$WindowsVersion = @{ 'Version' = '1909'; 'Build' = '18363' } -GlobalConditionName 'Operating System build' -CreateAppIfMissing -CreateGlobalConditionIfMissing
+PS C:\> New-CMLanguagePackApplication -SiteServer "cm.contoso.com" -SiteCode "P01" -SourcePath "\\cm.contoso.com\OSD\Source\1909-Languages" -Languages "fr-fr", "de-de" -WindowsVersion = @{ "Version" = "1909"; "Build" = "18363" } -GlobalConditionName "Operating System build" -CreateAppIfMissing -CreateGlobalConditionIfMissing
 ```
 
 Adds two new deployment types to applications with names "Windows 10 x64 Language Pack - fr-fr" and "Windows 10 x64 Language Pack - de-de". If the applications do not exist, create them.
